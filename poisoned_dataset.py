@@ -37,16 +37,15 @@ class PoisonedDataset(torch.utils.data.Dataset):
         self.poisoned_indices:NDArray = rng.choice(len(clean_data), size=num_to_poison, replace=False)
         
     
-    def __getitem__(self, idx:int):
+    def __getitem__(self, idx:int) -> tuple[torch.Tensor, tuple[int, bool]]:
         if idx in self.poisoned_indices:
           poisoned_image = insert_trigger(torch.squeeze(self.clean_data[idx][0]), self.trigger).unsqueeze(dim =0)
-          return (poisoned_image, (self.target_label, self.is_poisoned(idx)))
+          return (poisoned_image, (self.target_label, True))
         else:
-          return (self.clean_data[idx][0], (self.clean_data[idx][1], self.is_poisoned(idx)))
-
-    def is_poisoned(self, idx:int):
-        return idx in self.poisoned_indices
+          return (self.clean_data[idx][0], (self.clean_data[idx][1], False))
 
     def __len__(self):
         return len(self.clean_data)
 
+    def n_poisoned(self):
+        return len(self.poisoned_indices)
