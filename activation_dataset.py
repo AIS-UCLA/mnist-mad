@@ -1,18 +1,15 @@
 import torch
-import torch.nn.functional as F
-import pickle
 from torch.utils.data import Dataset
 
 class ActivationDataset(Dataset):
-    def __init__(self, path):
+    def __init__(self, x:list[torch.Tensor], y:list[bool]):
         super().__init__()
-        with open(path, 'rb') as f:
-            self.dataset = pickle.load(f)
+        assert len(x) == len(y)
+        self.x = x
+        self.y = y
         
-    def __getitem__(self, index) -> tuple[torch.Tensor, torch.Tensor]:
-        input1, input2, input3, output = self.dataset[index]
-        input_concat = torch.cat((input1, input2, input3), dim=1)
-        return input_concat.squeeze(), F.one_hot(output.long(), 2).float()
+    def __getitem__(self, index) -> tuple[torch.Tensor, bool]:
+        return self.x[index], self.y[index]
     
     def __len__(self):
-        return len(self.dataset)
+        return len(self.x)
