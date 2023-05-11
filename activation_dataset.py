@@ -9,7 +9,7 @@ class ActivationDataset(Dataset):
         with open(path, 'rb') as f:
             self.dataset = pickle.load(f)
         
-    def __getitem__(self, index):
+    def __getitem__(self, index) -> tuple[torch.Tensor, torch.Tensor]:
         input1, input2, input3, output = self.dataset[index]
         input_concat = torch.cat((input1, input2, input3), dim=1)
         return input_concat.squeeze(), F.one_hot(output.long(), 2).float()
